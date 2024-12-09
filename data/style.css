@@ -28,6 +28,17 @@ body {
   background-color: white;
   box-shadow: 2px 2px 12px 1px rgba(140,140,140,.5);
 }
+.graph-card-grid {
+  max-width: 100%;
+  padding: 1rem;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+}
+.graph-card {
+  background-color: white;
+  box-shadow: 2px 2px 12px 1px rgba(140,140,140,.5);
+  min-width: 40%;
+}
 .card-title {
   font-size: 1.2rem;
   font-weight: bold;

@@ -34,10 +34,21 @@ function onClose(event) {
 function onMessage(event) {
     console.log(event.data);
     var myObj = JSON.parse(event.data);
-    var keys = Object.keys(myObj);
 
-    for (var i = 0; i < keys.length; i++){
-        var key = keys[i];
-        document.getElementById(key).innerHTML = myObj[key];
-    }
+    // Update the HTML elements with the received values
+    document.getElementById("temperature").innerHTML = myObj["temperature"];
+    document.getElementById("humidity").innerHTML = myObj["humidity"];
+    document.getElementById("gas").innerHTML = myObj["gas"];
+
+    // Add the new data to the chart
+    const timeLabel = new Date().toLocaleTimeString(); // Current time as label
+    chart.data.labels.push(timeLabel);
+
+    // Add temperature, humidity, and gas data to the datasets
+    chart.data.datasets[0].data.push(parseFloat(myObj["temperature"]));
+    chart.data.datasets[1].data.push(parseFloat(myObj["humidity"]));
+    chart.data.datasets[2].data.push(parseFloat(myObj["gas"]));
+
+    // Update the chart
+    chart.update();
 }
