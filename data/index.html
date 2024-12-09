@@ -1,94 +1,31 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sensor Readings</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="icon" type="image/png" href="favicon.png">
-    <link rel="stylesheet" type="text/css" href="style.css">
-  </head>
-  <body>
-    <div class="topnav">
-      <h1>iot websocket</h1>
-    </div>
-    <div class="content">
-      <div class="card-grid">
-        <div class="card">
-          <p class="card-title"><i class="fas fa-thermometer-threequarters" style="color:#059e8a;"></i> Temperature</p>
-          <p class="reading"><span id="temperature"></span> &deg;C</p>
+<html>
+    <head>
+        <title>ESP IOT DASHBOARD</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="icon" type="image/png" href="favicon.png">
+        <link rel="stylesheet" type="text/css" href="style.css">
+    </head>
+    <body>
+        <div class="topnav">
+            <h1>SENSOR READINGS (WEBSOCKET)</h1>
         </div>
-        <div class="card">
-          <p class="card-title"> Humidity</p>
-          <p class="reading"><span id="humidity"></span> &percnt;</p>
+        <div class="content">
+            <div class="card-grid">
+                <div class="card">
+                    <p class="card-title"><i class="fas fa-thermometer-threequarters" style="color:#059e8a;"></i> Temperature</p>
+                    <p class="reading"><span id="temperature"></span> &deg;C</p>
+                </div>
+                <div class="card">
+                    <p class="card-title"> Humidity</p>
+                    <p class="reading"><span id="humidity"></span> &percnt;</p>
+                </div>
+                <div class="card">
+                    <p class="card-title"> Gas</p>
+                    <p class="reading"><span id="gas"></span> ppm</p>
+                </div>
+            </div>
         </div>
-        <div class="card">
-          <p class="card-title"> Dangerous Gas</p>
-          <p class="reading"><span id="gas"></span> ppm</p>
-        </div>
-      </div>
-        
-      <!-- <div>
-        <canvas id="myChart"></canvas>
-      </div> -->
-
-    </div>
-
-
-  <!-- <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script>
-    const ctx = document.getElementById('myChart');
-    const myChart = new Chart(ctx, {
-      type: 'line',
-      data: {
-        labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
-        datasets: [
-          {
-            label: 'Temperature',
-            data: [],
-            borderWidth: 1
-          },
-          {
-            label: 'Humidity',
-            data: [],
-            borderWidth: 1
-          },
-          {
-            label: 'Dangerous Gas',
-            data: [],
-            borderWidth: 1
-          },
-        ]
-      },
-      options: {
-        scales: {
-          y: {
-            beginAtZero: true
-          }
-        }
-      }
-    });
-
-    function updateChart(temperature, humidity, gas) {
-      myChart.data.datasets[0].data.push(temperature);
-      myChart.data.datasets[1].data.push(humidity);
-      myChart.data.datasets[2].data.push(gas);
-      
-      if (myChart.data.datasets[0].data.length > 20) {
-        myChart.data.datasets[0].data.shift();
-        myChart.data.datasets[1].data.shift();
-        myChart.data.datasets[2].data.shift();
-      }
-
-      myChart.update();
-    }
-
-    const websocket = new WebSocket(`ws://${window.location.hostname}/ws`);
-    websocket.onmessage = function(event) {
-      const myObj = JSON.parse(event.data);
-      updateChart(myObj.temperature, myObj.humidity, myObj.gas);
-    };
-  </script> -->
-     
-  </body>
+        <script src="script.js"></script>
+    </body>
 </html>

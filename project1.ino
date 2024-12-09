@@ -1,11 +1,4 @@
-/*********
-  Rui Santos & Sara Santos - Random Nerd Tutorials
-  Complete instructions at https://RandomNerdTutorials.com/esp32-websocket-server-sensor/
-  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files.
-  The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-*********/
 #include <Arduino.h>
-// #include "arduinoFFT.h"
 #include <WiFi.h>
 #include <AsyncTCP.h>
 #include <ESPAsyncWebServer.h>
@@ -21,13 +14,6 @@ DHT dht_sensor(DHT_SENSOR_PIN, DHT_SENSOR_TYPE);
 
 float humi, tempC;
 int gas;
-
-const uint16_t samples = 64;        // Number of samples (MUST be a power of 2)
-const double samplingFrequency = 1000; // Hz (adjust based on actual sampling rate)
-double vReal[samples];              // Real part of the FFT input
-double vImag[samples];              // Imaginary part of the FFT input
-
-// ArduinoFFT<double> FFT = ArduinoFFT<double>(vReal, vImag, samples, samplingFrequency);
 
 // Replace with your network credentials
 const char* ssid = "x";
@@ -141,25 +127,9 @@ void setup() {
 
   // Start server
   server.begin();
-  
-  Serial.println("Ready");
 }
 
 void loop() {
-
-  // humi  = dht_sensor.readHumidity();
-  // tempC = dht_sensor.readTemperature();
-  // gas = readSensor();
-
-  // // Update the serial output format for better graphing
-  // Serial.print(gas);
-  // Serial.print(","); // Delimiter for gas
-  // Serial.print(humi);
-  // Serial.print(","); // Delimiter for humidity
-  // Serial.print(tempC);
-  // Serial.println(); // End of line for temperature
-  // delay(200);  // wait for the MQ2 to warm up
-
 
   if ((millis() - lastTime) > timerDelay) {
     String sensorReadings = getSensorReadings();
