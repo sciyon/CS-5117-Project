@@ -5,6 +5,7 @@
 #include "LittleFS.h"
 #include <Arduino_JSON.h>
 #include <DHT.h>
+#include "arduinoFFT.h"
 
 #define DHT_SENSOR_PIN  21 // ESP32 pin GPIO21 connected to DHT22 sensor
 #define DHT_SENSOR_TYPE DHT22
@@ -12,27 +13,19 @@
 
 DHT dht_sensor(DHT_SENSOR_PIN, DHT_SENSOR_TYPE);
 
-float humi, tempC;
-int gas;
-
-// Replace with your network credentials
 const char* ssid = "x";
 const char* password = "ilovebellelast1m0sa_";
 
-// Create AsyncWebServer object on port 80
-AsyncWebServer server(80);
-
-// Create a WebSocket object
-AsyncWebSocket ws("/ws");
-
-// Json Variable to Hold Sensor Readings
 JSONVar readings;
-
-// Timer variables
 unsigned long lastTime = 0;
 unsigned long timerDelay = 200;
 
-// Get Sensor Readings and return JSON object
+const uint16_t samples = 64;        // Number of samples (MUST be a power of 2)
+const double samplingFrequency = 1000; // Hz (adjust based on actual sampling rate)
+
+AsyncWebServer server(80);
+AsyncWebSocket ws("/ws");
+
 String getSensorReadings(){
   readings["temperature"] = String(dht_sensor.readTemperature());
   readings["humidity"] =  String(dht_sensor.readHumidity());
@@ -110,7 +103,6 @@ void initWebSocket() {
 }
 
 void setup() {
-
   Serial.begin(115200);
   initWiFi();
   initLittleFS();
@@ -129,7 +121,59 @@ void setup() {
   server.begin();
 }
 
+void calculateFFT(double *data, const char *label) {
+  double vReal[samples];
+  double vImag[samples] = {0};
+
+  // Copy data to the FFT input arrays
+  memcpy(vReal, data, sizeof(vReal));
+
+  // Declare and instantiate the FFT object
+  ArduinoFFT<double> FFT = ArduinoFFT<double>(vReal, vImag, samples, samplingFrequency);
+
+  // Perform FFT
+  FFT.windowing(FFTWindow::Hamming, FFTDirection::Forward);
+  FFT.compute(FFTDirection::Forward);
+  FFT.complexToMagnitude();
+
+  // Send FFT results over WebSocket
+  JSONVar fftResults;
+  JSONVar magnitudes;
+  JSONVar frequencies;
+
+  for (uint16_t i = 0; i < (samples >> 1); i++) { // Only half the FFT results are useful
+    double frequency = (i * samplingFrequency) / samples;
+    frequencies[i] = frequency;
+    magnitudes[i] = vReal[i];
+  }
+
+  fftResults["label"] = label;
+  fftResults["frequencies"] = frequencies;
+  fftResults["magnitudes"] = magnitudes;
+
+  ws.textAll(JSON.stringify(fftResults));
+}
+
 void loop() {
+  static double fftDataGas[samples] = {0};
+  static double fftDataTemp[samples] = {0};
+  static double fftDataHumi[samples] = {0};
+  static int sampleIndex = 0;
+
+  if (sampleIndex < samples) {
+    fftDataGas[sampleIndex] = readSensor();                // Gas data
+    fftDataTemp[sampleIndex] = dht_sensor.readTemperature(); // Temperature data
+    fftDataHumi[sampleIndex] = dht_sensor.readHumidity();    // Humidity data
+    sampleIndex++;
+  }
+
+  if (sampleIndex >= samples) {
+    // Perform FFT for each dataset
+    calculateFFT(fftDataGas, "gas");
+    calculateFFT(fftDataTemp, "temperature");
+    calculateFFT(fftDataHumi, "humidity");
+    sampleIndex = 0; // Reset sample index for the next interval
+  }
 
   if ((millis() - lastTime) > timerDelay) {
     String sensorReadings = getSensorReadings();

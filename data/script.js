@@ -30,25 +30,44 @@ function onClose(event) {
     setTimeout(initWebSocket, 2000);
 }
 
+function updateFFTChart(fftData) {
+  const { label, frequencies, magnitudes } = fftData;
+
+  const fftChart = Chart.getChart("fftChart");
+
+  if (label === 'temperature') {
+    fftChart.data.datasets[0].data = magnitudes;
+  } else if (label === 'humidity') {
+    fftChart.data.datasets[1].data = magnitudes;
+  } else if (label === 'gas') {
+    fftChart.data.datasets[2].data = magnitudes;
+  }
+
+  fftChart.data.labels = frequencies; // Shared labels
+  fftChart.update();
+}
+
 // Function that receives the message from the ESP32 with the readings
 function onMessage(event) {
-    console.log(event.data);
-    var myObj = JSON.parse(event.data);
+  console.log(event.data);
+  const data = JSON.parse(event.data);
 
-    // Update the HTML elements with the received values
-    document.getElementById("temperature").innerHTML = myObj["temperature"];
-    document.getElementById("humidity").innerHTML = myObj["humidity"];
-    document.getElementById("gas").innerHTML = myObj["gas"];
+  // Update FFT chart if FFT data is present
+  if (data.frequencies && data.magnitudes) {
+      updateFFTChart(data);
+  }
 
-    // Add the new data to the chart
-    const timeLabel = new Date().toLocaleTimeString(); // Current time as label
-    chart.data.labels.push(timeLabel);
+  // Update live sensor readings if sensor data is present
+  if (data.temperature && data.humidity && data.gas) {
+      document.getElementById("temperature").innerHTML = data["temperature"];
+      document.getElementById("humidity").innerHTML = data["humidity"];
+      document.getElementById("gas").innerHTML = data["gas"];
 
-    // Add temperature, humidity, and gas data to the datasets
-    chart.data.datasets[0].data.push(parseFloat(myObj["temperature"]));
-    chart.data.datasets[1].data.push(parseFloat(myObj["humidity"]));
-    chart.data.datasets[2].data.push(parseFloat(myObj["gas"]));
-
-    // Update the chart
-    chart.update();
+      const timeLabel = new Date().toLocaleTimeString();
+      chart.data.labels.push(timeLabel);
+      chart.data.datasets[0].data.push(parseFloat(data["temperature"]));
+      chart.data.datasets[1].data.push(parseFloat(data["humidity"]));
+      chart.data.datasets[2].data.push(parseFloat(data["gas"]));
+      chart.update();
+  }
 }

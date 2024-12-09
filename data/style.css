@@ -31,14 +31,22 @@ body {
 .graph-card-grid {
   max-width: 100%;
   padding: 1rem;
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  display: flex; /* Changed to flex for easier spacing */
+  flex-direction: row; /* Stack the graphs vertically */
+  gap: 1rem; /* Add spacing between the two graph cards */
+  height: calc(100vh - 200px); /* Adjust height to subtract the topnav and padding */
 }
+
 .graph-card {
   background-color: white;
-  box-shadow: 2px 2px 12px 1px rgba(140,140,140,.5);
-  min-width: 40%;
+  box-shadow: 2px 2px 12px 1px rgba(140, 140, 140, 0.5);
+  flex: 1; /* Ensure the graph cards take up equal height */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 0; /* Prevent minimum height constraints from interfering */
 }
+
 .card-title {
   font-size: 1.2rem;
   font-weight: bold;
