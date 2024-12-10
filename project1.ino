@@ -13,8 +13,8 @@
 
 DHT dht_sensor(DHT_SENSOR_PIN, DHT_SENSOR_TYPE);
 
-const char* ssid = "x";
-const char* password = "ilovebellelast1m0sa_";
+const char* ssid = "WIFI_SSID";
+const char* password = "WIFI_PASSWORD";
 
 JSONVar readings;
 unsigned long lastTime = 0;
